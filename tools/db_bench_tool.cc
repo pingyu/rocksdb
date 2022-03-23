@@ -1077,6 +1077,10 @@ DEFINE_bool(adaptive_readahead, false,
             "carry forward internal auto readahead size from one file to next "
             "file at each level during iteration");
 
+DEFINE_bool(async_io, false,
+            "When set true, RocksDB does asynchronous reads for internal auto "
+            "readahead prefetching.");
+
 static enum ROCKSDB_NAMESPACE::CompressionType StringToCompressionType(
     const char* ctype) {
   assert(ctype);
@@ -3341,6 +3345,17 @@ class Benchmark {
         write_options_.sync = true;
       }
       write_options_.disableWAL = FLAGS_disable_wal;
+      write_options_.rate_limiter_priority =
+          FLAGS_rate_limit_auto_wal_flush ? Env::IO_USER : Env::IO_TOTAL;
+      read_options_ = ReadOptions(FLAGS_verify_checksum, true);
+      read_options_.total_order_seek = FLAGS_total_order_seek;
+      read_options_.prefix_same_as_start = FLAGS_prefix_same_as_start;
+      read_options_.rate_limiter_priority =
+          FLAGS_rate_limit_user_ops ? Env::IO_USER : Env::IO_TOTAL;
+      read_options_.tailing = FLAGS_use_tailing_iterator;
+      read_options_.readahead_size = FLAGS_readahead_size;
+      read_options_.adaptive_readahead = FLAGS_adaptive_readahead;
+      read_options_.async_io = FLAGS_async_io;
 
       void (Benchmark::*method)(ThreadState*) = nullptr;
       void (Benchmark::*post_process_method)() = nullptr;
@@ -5609,6 +5624,8 @@ class Benchmark {
     }
 
     options.adaptive_readahead = FLAGS_adaptive_readahead;
+    options.async_io = FLAGS_async_io;
+
     Iterator* iter = db->NewIterator(options);
     int64_t i = 0;
     int64_t bytes = 0;
@@ -7529,6 +7546,33 @@ class Benchmark {
   }
 
 #ifndef ROCKSDB_LITE
+  void VerifyChecksum(ThreadState* thread) {
+    DB* db = SelectDB(thread);
+    ReadOptions ro;
+    ro.adaptive_readahead = FLAGS_adaptive_readahead;
+    ro.async_io = FLAGS_async_io;
+    ro.readahead_size = FLAGS_readahead_size;
+    Status s = db->VerifyChecksum(ro);
+    if (!s.ok()) {
+      fprintf(stderr, "VerifyChecksum() failed: %s\n", s.ToString().c_str());
+      exit(1);
+    }
+  }
+
+  void VerifyFileChecksums(ThreadState* thread) {
+    DB* db = SelectDB(thread);
+    ReadOptions ro;
+    ro.adaptive_readahead = FLAGS_adaptive_readahead;
+    ro.async_io = FLAGS_async_io;
+    ro.readahead_size = FLAGS_readahead_size;
+    Status s = db->VerifyFileChecksums(ro);
+    if (!s.ok()) {
+      fprintf(stderr, "VerifyFileChecksums() failed: %s\n",
+              s.ToString().c_str());
+      exit(1);
+    }
+  }
+
   // This benchmark stress tests Transactions.  For a given --duration (or
   // total number of --writes, a Transaction will perform a read-modify-write
   // to increment the value of a key in each of N(--transaction-sets) sets of
