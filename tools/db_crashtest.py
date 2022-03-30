@@ -158,6 +158,8 @@ default_params = {
     "prepopulate_block_cache" : lambda: random.choice([0, 1]),
     "memtable_prefix_bloom_size_ratio": lambda: random.choice([0.001, 0.01, 0.1, 0.5]),
     "memtable_whole_key_filtering": lambda: random.randint(0, 1),
+    "adaptive_readahead": lambda: random.choice([0, 1]),
+    "async_io": lambda: random.choice([0, 1]),
 }
 
 _TEST_DIR_ENV_VAR = 'TEST_TMPDIR'

@@ -273,6 +273,9 @@ DECLARE_int32(secondary_cache_fault_one_in);
 
 DECLARE_int32(prepopulate_block_cache);
 
+DECLARE_bool(adaptive_readahead);
+DECLARE_bool(async_io);
+
 constexpr long KB = 1024;
 constexpr int kRandomValueMaxFactor = 3;
 constexpr int kValueMaxLen = 100;

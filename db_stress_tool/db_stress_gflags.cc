@@ -879,4 +879,11 @@ DEFINE_int32(prepopulate_block_cache,
              "Options related to cache warming (see `enum "
              "PrepopulateBlockCache` in table.h)");
 
+DEFINE_bool(adaptive_readahead, false,
+            "Carry forward internal auto readahead size from one file to next "
+            "file at each level during iteration");
+DEFINE_bool(
+    async_io, false,
+    "Does asynchronous prefetching when internal auto readahead is enabled");
+
 #endif  // GFLAGS

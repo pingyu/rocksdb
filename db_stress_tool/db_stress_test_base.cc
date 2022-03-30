@@ -636,6 +636,8 @@ Status StressTest::RollbackTxn(Transaction* txn) {
 
 void StressTest::OperateDb(ThreadState* thread) {
   ReadOptions read_opts(FLAGS_verify_checksum, true);
+  read_opts.async_io = FLAGS_async_io;
+  read_opts.adaptive_readahead = FLAGS_adaptive_readahead;
   WriteOptions write_opts;
   auto shared = thread->shared;
   char value[100];
