@@ -91,6 +91,15 @@ class RandomAccessFileReader {
   std::vector<std::shared_ptr<EventListener>> listeners_;
   Temperature file_temperature_;
 
+  struct ReadAsyncInfo {
+#ifndef ROCKSDB_LITE
+    FileOperationInfo::StartTimePoint fs_start_ts_;
+#endif
+    uint64_t start_time_;
+    std::function<void(const FSReadRequest&, void*)> cb_;
+    void* cb_arg_;
+  };
+
  public:
   explicit RandomAccessFileReader(
       std::unique_ptr<FSRandomAccessFile>&& raf, const std::string& _file_name,
@@ -167,5 +176,7 @@ class RandomAccessFileReader {
                      std::function<void(const FSReadRequest&, void*)> cb,
                      void* cb_arg, void** io_handle, IOHandleDeleter* del_fn,
                      bool for_compaction);
+
+  void ReadAsyncCallback(const FSReadRequest& req, void* cb_arg);
 };
 }  // namespace ROCKSDB_NAMESPACE
