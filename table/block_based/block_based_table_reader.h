@@ -661,7 +661,8 @@ struct BlockBasedTable::Rep {
     fpb->reset(new FilePrefetchBuffer(
         readahead_size, max_readahead_size,
         !ioptions.allow_mmap_reads /* enable */, false /* track_min_offset */,
-        implicit_auto_readahead, async_io, ioptions.fs));
+        implicit_auto_readahead, async_io, ioptions.fs, ioptions.clock,
+        ioptions.stats));
   }
 
   void CreateFilePrefetchBufferIfNotExists(
