@@ -111,6 +111,7 @@ enum PerfFlag : uint32_t {
   logger_nanos,
   cpu_read_nanos,
   cpu_write_nanos,
+  number_async_seek,
   // Should always be the last
   COUNT
 };

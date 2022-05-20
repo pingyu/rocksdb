@@ -38,6 +38,14 @@ void BlockPrefetcher::PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
     return;
   }
 
+  // In case of async_io, it always creates the PrefetchBuffer.
+  if (async_io) {
+    rep->CreateFilePrefetchBufferIfNotExists(
+        initial_auto_readahead_size_, max_auto_readahead_size,
+        &prefetch_buffer_, /*implicit_auto_readahead=*/true, async_io);
+    return;
+  }
+
   size_t len = BlockBasedTable::BlockSizeWithTrailer(handle);
   size_t offset = handle.offset();
 
