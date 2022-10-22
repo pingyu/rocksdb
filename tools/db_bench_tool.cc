@@ -2715,6 +2715,7 @@ class Benchmark {
   int64_t writes_per_range_tombstone_;
   int64_t range_tombstone_width_;
   int64_t max_num_range_tombstones_;
+  ReadOptions read_options_;
   WriteOptions write_options_;
   Options open_options_;  // keep options around to properly destroy db later
 #ifndef ROCKSDB_LITE
@@ -3345,15 +3346,7 @@ class Benchmark {
         write_options_.sync = true;
       }
       write_options_.disableWAL = FLAGS_disable_wal;
-      write_options_.rate_limiter_priority =
-          FLAGS_rate_limit_auto_wal_flush ? Env::IO_USER : Env::IO_TOTAL;
       read_options_ = ReadOptions(FLAGS_verify_checksum, true);
-      read_options_.total_order_seek = FLAGS_total_order_seek;
-      read_options_.prefix_same_as_start = FLAGS_prefix_same_as_start;
-      read_options_.rate_limiter_priority =
-          FLAGS_rate_limit_user_ops ? Env::IO_USER : Env::IO_TOTAL;
-      read_options_.tailing = FLAGS_use_tailing_iterator;
-      read_options_.readahead_size = FLAGS_readahead_size;
       read_options_.adaptive_readahead = FLAGS_adaptive_readahead;
       read_options_.async_io = FLAGS_async_io;
 
@@ -6513,6 +6506,7 @@ class Benchmark {
     options.tailing = FLAGS_use_tailing_iterator;
     options.readahead_size = FLAGS_readahead_size;
     options.adaptive_readahead = FLAGS_adaptive_readahead;
+    options.async_io = FLAGS_async_io;
     std::unique_ptr<char[]> ts_guard;
     Slice ts;
     if (user_timestamp_size_ > 0) {
@@ -7546,33 +7540,6 @@ class Benchmark {
   }
 
 #ifndef ROCKSDB_LITE
-  void VerifyChecksum(ThreadState* thread) {
-    DB* db = SelectDB(thread);
-    ReadOptions ro;
-    ro.adaptive_readahead = FLAGS_adaptive_readahead;
-    ro.async_io = FLAGS_async_io;
-    ro.readahead_size = FLAGS_readahead_size;
-    Status s = db->VerifyChecksum(ro);
-    if (!s.ok()) {
-      fprintf(stderr, "VerifyChecksum() failed: %s\n", s.ToString().c_str());
-      exit(1);
-    }
-  }
-
-  void VerifyFileChecksums(ThreadState* thread) {
-    DB* db = SelectDB(thread);
-    ReadOptions ro;
-    ro.adaptive_readahead = FLAGS_adaptive_readahead;
-    ro.async_io = FLAGS_async_io;
-    ro.readahead_size = FLAGS_readahead_size;
-    Status s = db->VerifyFileChecksums(ro);
-    if (!s.ok()) {
-      fprintf(stderr, "VerifyFileChecksums() failed: %s\n",
-              s.ToString().c_str());
-      exit(1);
-    }
-  }
-
   // This benchmark stress tests Transactions.  For a given --duration (or
   // total number of --writes, a Transaction will perform a read-modify-write
   // to increment the value of a key in each of N(--transaction-sets) sets of
