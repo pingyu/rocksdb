@@ -477,10 +477,10 @@ IOStatus RandomAccessFileReader::ReadAsync(
     FSReadRequest& req, const IOOptions& opts,
     std::function<void(const FSReadRequest&, void*)> cb, void* cb_arg,
     void** io_handle, IOHandleDeleter* del_fn,
-    Env::IOPriority rate_limiter_priority) {
+    bool for_compaction) {
   if (use_direct_io()) {
     req.status = Read(opts, req.offset, req.len, &(req.result), req.scratch,
-                      nullptr /*dbg*/, rate_limiter_priority);
+                      nullptr /*dbg*/, for_compaction);
     cb(req, cb_arg);
     return IOStatus::OK();
   }

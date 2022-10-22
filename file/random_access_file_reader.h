@@ -166,6 +166,6 @@ class RandomAccessFileReader {
   IOStatus ReadAsync(FSReadRequest& req, const IOOptions& opts,
                      std::function<void(const FSReadRequest&, void*)> cb,
                      void* cb_arg, void** io_handle, IOHandleDeleter* del_fn,
-                     Env::IOPriority rate_limiter_priority);
+                     bool for_compaction);
 };
 }  // namespace ROCKSDB_NAMESPACE
