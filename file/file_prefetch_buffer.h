@@ -65,7 +65,7 @@ class FilePrefetchBuffer {
   FilePrefetchBuffer(size_t readahead_size = 0, size_t max_readahead_size = 0,
                      bool enable = true, bool track_min_offset = false,
                      bool implicit_auto_readahead = false,
-                     bool async_io = false, FileSystem* fs = nullptr)
+                     bool async_io = false, std::shared_ptr<FileSystem> fs = nullptr)
       : curr_(0),
         readahead_size_(readahead_size),
         max_readahead_size_(max_readahead_size),
@@ -262,6 +262,6 @@ class FilePrefetchBuffer {
   IOHandleDeleter del_fn_;
   bool async_read_in_progress_;
   bool async_io_;
-  FileSystem* fs_;
+  std::shared_ptr<FileSystem> fs_;
 };
 }  // namespace ROCKSDB_NAMESPACE
