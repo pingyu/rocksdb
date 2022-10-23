@@ -669,8 +669,8 @@ ReadOptions::ReadOptions()
       deadline(std::chrono::microseconds::zero()),
       io_timeout(std::chrono::microseconds::zero()),
       value_size_soft_limit(std::numeric_limits<uint64_t>::max()),
-      adaptive_readahead(false),
-      async_io(false) {}
+      adaptive_readahead(true),
+      async_io(true) {}
 
 ReadOptions::ReadOptions(bool cksum, bool cache)
     : snapshot(nullptr),
@@ -694,7 +694,7 @@ ReadOptions::ReadOptions(bool cksum, bool cache)
       deadline(std::chrono::microseconds::zero()),
       io_timeout(std::chrono::microseconds::zero()),
       value_size_soft_limit(std::numeric_limits<uint64_t>::max()),
-      adaptive_readahead(false),
-      async_io(false) {}
+      adaptive_readahead(true),
+      async_io(true) {}
 
 }  // namespace ROCKSDB_NAMESPACE
