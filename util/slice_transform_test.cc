@@ -98,7 +98,7 @@ uint64_t TestGetTickerCount(const Options& options, Tickers ticker_type) {
 
 TEST_F(SliceTransformDBTest, CapPrefix) {
   last_options_.prefix_extractor.reset(NewCappedPrefixTransform(8));
-  last_options_.statistics = ROCKSDB_NAMESPACE::CreateDBStatistics();
+  last_options_.statistics = CreateDBStatistics();
   BlockBasedTableOptions bbto;
   bbto.filter_policy.reset(NewBloomFilterPolicy(10, false));
   bbto.whole_key_filtering = false;
